@@ -1,0 +1,267 @@
+<header class="header">
+
+  <div class="logo">
+    NateNovaShop
+  </div>
+
+  <button class="cart-btn">
+    🛒 {{ cart.length }}
+  </button>
+
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+
+  <div class="overlay"></div>
+
+  <div class="hero-content">
+
+    <span class="tag">
+      Tecnología Premium
+    </span>
+
+    <h1>
+      Compra lo mejor
+      en tecnología
+    </h1>
+
+    <p>
+      Productos exclusivos con pagos seguros usando Stripe
+    </p>
+
+    <button class="shop-btn">
+      Ver productos
+    </button>
+
+  </div>
+
+</section>
+
+<!-- ADMIN PANEL -->
+
+<section class="admin-panel">
+
+  <h2>
+    Agregar Producto
+  </h2>
+
+  <div class="form">
+
+    <input
+      type="text"
+      placeholder="Nombre"
+      [(ngModel)]="newProduct.title"
+    >
+
+    <input
+      type="number"
+      placeholder="Precio"
+      [(ngModel)]="newProduct.price"
+    >
+
+    <input
+      type="text"
+      placeholder="Imagen URL"
+      [(ngModel)]="newProduct.image"
+    >
+
+    <button (click)="addProduct()">
+      Agregar
+    </button>
+
+  </div>
+
+</section>
+
+<!-- PRODUCTS -->
+
+<section class="products-section">
+
+  <div class="section-header">
+
+    <h2>
+      Productos Destacados
+    </h2>
+
+    <p>
+      Explora nuestra colección premium
+    </p>
+
+  </div>
+
+  <div class="products">
+
+    <div
+      class="card"
+      *ngFor="let product of products"
+    >
+
+      <img [src]="product.image">
+
+      <div class="card-content">
+
+        <h3>
+          {{ product.title }}
+        </h3>
+
+        <p class="description">
+          {{ product.description }}
+        </p>
+
+        <p class="price">
+          ${{ product.price }}
+        </p>
+
+        <div class="actions">
+
+          <button
+            class="buy-btn"
+            (click)="addToCart(product)"
+          >
+            Comprar
+          </button>
+
+          <button
+            class="delete-btn"
+            (click)="deleteProduct(product.id)"
+          >
+            Eliminar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- CART -->
+
+<div class="cart-sidebar custom-cart">
+
+  <h2>
+    🛒 Carrito
+  </h2>
+
+  <div
+    class="cart-item"
+    *ngFor="let item of cart"
+  >
+
+    <img [src]="item.image">
+
+    <div class="cart-info">
+
+      <h4>
+        {{ item.title }}
+      </h4>
+
+      <p>
+        ${{ item.price }}
+      </p>
+
+    </div>
+
+  </div>
+
+  <h3 class="cart-total">
+    Total: ${{ getTotal() }}
+  </h3>
+
+  <button
+    class="checkout-btn"
+    (click)="checkout()"
+  >
+    Pagar con Stripe
+  </button>
+
+</div>
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <div class="footer-brand">
+
+      <h2>
+        NateNovaShop
+      </h2>
+
+      <p>
+        Tecnología premium con pagos seguros y experiencia moderna.
+      </p>
+
+    </div>
+
+    <div class="footer-links">
+
+      <h3>
+        Enlaces
+      </h3>
+
+      <a href="#">
+        Inicio
+      </a>
+
+      <a href="#">
+        Productos
+      </a>
+
+      <a href="#">
+        Soporte
+      </a>
+
+    </div>
+
+    <div class="footer-contact">
+
+      <h3>
+        Contacto
+      </h3>
+
+      <p>
+        📧 soporte&#64;natenova.com
+      </p>
+
+      <p>
+        📱 +52 55 0000 0000
+      </p>
+
+    </div>
+
+    <div class="footer-social">
+
+      <h3>
+        Redes
+      </h3>
+
+      <a href="#">
+        Instagram
+      </a>
+
+      <a href="#">
+        TikTok
+      </a>
+
+      <a href="#">
+        Facebook
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+
+    © 2026 NateNovaShop • Todos los derechos reservados
+
+  </div>
+
+</footer>
