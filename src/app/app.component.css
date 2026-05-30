@@ -377,6 +377,36 @@ body {
   transition: 0.3s;
 }
 
+/* EDIT BUTTON */
+
+.edit-btn {
+  flex: 1;
+
+  background: white;
+
+  color: #ec4899;
+
+  border: 2px solid #ec4899;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.edit-btn:hover {
+  background: #ec4899;
+  color: white;
+  transform: scale(1.02);
+}
+
 .buy-btn:hover {
   background: #333;
   transform: scale(1.02);
@@ -486,38 +516,33 @@ body {
 /* STRIPE BUTTON */
 
 .checkout-btn {
+  width: 60% !important;
 
-  width: 100%;
+  background: blue !important;
 
-  margin-top: 20px;
+  color: rgb(236, 241, 235) !important;
 
-  border: none;
+  border: 5px solid rgb(15, 201, 15) !important;
 
-  padding: 15px;
+  padding: 14px !important;
 
-  border-radius: 14px;
+  border-radius: 10px !important;
 
-  background:
-    linear-gradient(
-      135deg,
-      #635bff,
-      #5a54f9
-    );
+  font-size: 15px !important;
 
-  color: white;
+  font-weight: bold !important;
 
-  font-size: 16px;
+  cursor: pointer !important;
+}
 
-  font-weight: 700;
+.checkout-btn:hover {
+  background: #0056b3;
 
-  letter-spacing: 0.5px;
+  transform: scale(1.02);
+}
 
-  cursor: pointer;
-
-  transition: 0.3s;
-
-  box-shadow:
-    0 8px 18px rgba(99,91,255,0.30);
+.checkout-btn:active {
+  transform: scale(0.98);
 }
 
 .checkout-btn:hover {

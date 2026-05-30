@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,10 +9,9 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   products = [
-
     {
       id: 1,
       title: 'MacBook Pro',
@@ -20,7 +19,6 @@ export class AppComponent {
       price: 49999,
       image: 'https://picsum.photos/500/350?1'
     },
-
     {
       id: 2,
       title: 'iPhone Ultra',
@@ -28,10 +26,11 @@ export class AppComponent {
       price: 28999,
       image: 'https://picsum.photos/500/350?2'
     }
-
   ];
 
   cart: any[] = [];
+
+  editingProductId: number | null = null;
 
   newProduct = {
     title: '',
@@ -40,22 +39,90 @@ export class AppComponent {
     image: ''
   };
 
-  addToCart(product: any) {
+  ngOnInit(): void {
 
-    this.cart.push(product);
+    const savedProducts = localStorage.getItem('products');
 
-  }
-
-  deleteProduct(id: number) {
-
-    this.products =
-      this.products.filter(
-        product => product.id !== id
+    if (savedProducts) {
+      this.products = JSON.parse(savedProducts);
+    } else {
+      localStorage.setItem(
+        'products',
+        JSON.stringify(this.products)
       );
+    }
+  }
+
+  addToCart(product: any): void {
+    this.cart.push(product);
+  }
+
+  deleteProduct(id: number): void {
+
+    this.products = this.products.filter(
+      product => product.id !== id
+    );
+
+    localStorage.setItem(
+      'products',
+      JSON.stringify(this.products)
+    );
+
+    if (this.editingProductId === id) {
+
+      this.editingProductId = null;
+
+      this.newProduct = {
+        title: '',
+        description: '',
+        price: 0,
+        image: ''
+      };
+    }
+  }
+
+  editProduct(product: any): void {
+
+    this.newProduct = {
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      image: product.image
+    };
+
+    this.editingProductId = product.id;
+  }
+
+  addProduct(): void {
+
+  if (!this.newProduct.title.trim()) {
+
+    alert('Ingresa el nombre del producto.');
+    return;
 
   }
 
-  addProduct() {
+  if (this.editingProductId !== null) {
+
+    const index = this.products.findIndex(
+      p => p.id === this.editingProductId
+    );
+
+    if (index !== -1) {
+
+      this.products[index] = {
+        id: this.editingProductId,
+        title: this.newProduct.title,
+        description: this.newProduct.description || '',
+        price: this.newProduct.price,
+        image: this.newProduct.image
+      };
+
+    }
+
+    this.editingProductId = null;
+
+  } else {
 
     const product = {
 
@@ -63,73 +130,84 @@ export class AppComponent {
 
       title: this.newProduct.title,
 
-      description: this.newProduct.description,
+      description:
+        this.newProduct.description || '',
 
       price: this.newProduct.price,
 
-      image: this.newProduct.image
+      image:
+        this.newProduct.image ||
+        'https://picsum.photos/500/350'
 
     };
 
     this.products.push(product);
 
-    this.newProduct = {
-      title: '',
-      description: '',
-      price: 0,
-      image: ''
-    };
+  }
+
+  localStorage.setItem(
+    'products',
+    JSON.stringify(this.products)
+  );
+
+  this.newProduct = {
+    title: '',
+    description: '',
+    price: 0,
+    image: ''
+  };
 
   }
 
-  getTotal() {
+  getTotal(): number {
 
     return this.cart.reduce(
-      (total, item) =>
-        total + item.price,
+      (total, item) => total + item.price,
       0
     );
-
   }
 
-    async checkout() {
+  clearCart(): void {
+    this.cart = [];
+  }
+
+  async checkout(): Promise<void> {
 
     try {
 
       const response = await fetch(
-        "http://localhost:3000/create-checkout-session",
+        'http://localhost:3000/api/pagos/checkout',
         {
-          method: "POST",
-
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
           },
-
           body: JSON.stringify({
-
             items: this.cart.map(item => ({
-
               name: item.title,
               price: item.price,
               quantity: 1
-
             }))
-
           })
-
         }
       );
 
       const data = await response.json();
 
-      window.location.href = data.url;
+      console.log('Stripe response:', data);
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('No se recibió URL de Stripe');
+      }
 
     } catch (error) {
 
-      console.error("Stripe Checkout Error:", error);
-
+      console.error(
+        'Error al iniciar checkout:',
+        error
+      );
     }
-
   }
-
 }

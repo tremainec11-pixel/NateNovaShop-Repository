@@ -124,6 +124,14 @@
           </button>
 
           <button
+           class="edit-btn"
+           (click)="editProduct(product)"
+>
+           Editar
+          </button>
+          
+
+          <button
             class="delete-btn"
             (click)="deleteProduct(product.id)"
           >
@@ -174,11 +182,12 @@
   </h3>
 
   <button
-    class="checkout-btn"
-    (click)="checkout()"
-  >
-    Pagar con Stripe
-  </button>
+  class="checkout-btn"
+  (click)="checkout()"
+  style="background: blue; color: white; border: none;"
+>
+  Pagar
+</button>
 
 </div>
 
@@ -231,7 +240,7 @@
       </p>
 
       <p>
-        📱 +52 55 0000 0000
+        📱 +52 55 32429879
       </p>
 
     </div>
