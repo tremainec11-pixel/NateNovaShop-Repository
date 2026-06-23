@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
       id: 1,
       title: 'MacBook Pro',
       description: 'M4 • 32GB RAM',
+      category: 'Electronics',
       price: 49999,
       image: 'https://picsum.photos/500/350?1'
     },
@@ -23,21 +24,31 @@ export class AppComponent implements OnInit {
       id: 2,
       title: 'iPhone Ultra',
       description: 'OLED • 512GB',
+      category: 'Electronics',
       price: 28999,
       image: 'https://picsum.photos/500/350?2'
     }
   ];
 
   cart: any[] = [];
+  favorites: any[] = [];
+  
 
-  editingProductId: number | null = null;
+editingProductId: number | null = null;
 
-  newProduct = {
-    title: '',
-    description: '',
-    price: 0,
-    image: ''
-  };
+selectedCategory = 'All';
+
+searchTerm = '';
+
+showAccountPanel = false;
+
+newProduct = {
+  title: '',
+  description: '',
+  category: '',
+  price: 0,
+  image: ''
+};
 
   ngOnInit(): void {
 
@@ -53,31 +64,79 @@ export class AppComponent implements OnInit {
     }
   }
 
-  addToCart(product: any): void {
-    this.cart.push(product);
+  getFilteredProducts() {
+
+  let filtered = this.products;
+
+  if (this.selectedCategory !== 'All') {
+
+    filtered = filtered.filter(
+      product =>
+        (product.category || '') === this.selectedCategory
+    );
   }
 
-  deleteProduct(id: number): void {
+  if (this.searchTerm.trim()) {
 
-    this.products = this.products.filter(
-      product => product.id !== id
+    filtered = filtered.filter(product =>
+      product.title
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
     );
+  }
 
-    localStorage.setItem(
-      'products',
-      JSON.stringify(this.products)
-    );
+  return filtered;
+}
 
-    if (this.editingProductId === id) {
+   
+addToCart(product: any): void {
+  this.cart.push(product);
+}
 
-      this.editingProductId = null;
+toggleFavorite(product: any): void {
 
-      this.newProduct = {
-        title: '',
-        description: '',
-        price: 0,
-        image: ''
-      };
+  const index = this.favorites.findIndex(
+    p => p.id === product.id
+  );
+
+  if (index === -1) {
+    this.favorites.push(product);
+  } else {
+    this.favorites.splice(index, 1);
+  }
+}
+
+isFavorite(product: any): boolean {
+
+  return this.favorites.some(
+    p => p.id === product.id
+  );
+}
+
+deleteProduct(id: number): void {
+    if (confirm('¿Eliminar producto?')) {
+
+      this.products = this.products.filter(
+        product => product.id !== id
+      );
+
+      localStorage.setItem(
+        'products',
+        JSON.stringify(this.products)
+      );
+
+      if (this.editingProductId === id) {
+
+        this.editingProductId = null;
+
+        this.newProduct = {
+          title: '',
+          description: '',
+          category: '',
+          price: 0,
+          image: ''
+        };
+      }
     }
   }
 
@@ -86,6 +145,7 @@ export class AppComponent implements OnInit {
     this.newProduct = {
       title: product.title,
       description: product.description,
+      category: product.category || '',
       price: product.price,
       image: product.image
     };
@@ -95,68 +155,77 @@ export class AppComponent implements OnInit {
 
   addProduct(): void {
 
-  if (!this.newProduct.title.trim()) {
-
-    alert('Ingresa el nombre del producto.');
-    return;
-
-  }
-
-  if (this.editingProductId !== null) {
-
-    const index = this.products.findIndex(
-      p => p.id === this.editingProductId
-    );
-
-    if (index !== -1) {
-
-      this.products[index] = {
-        id: this.editingProductId,
-        title: this.newProduct.title,
-        description: this.newProduct.description || '',
-        price: this.newProduct.price,
-        image: this.newProduct.image
-      };
-
+    if (!this.newProduct.title.trim()) {
+      alert('Ingresa el nombre del producto.');
+      return;
     }
 
-    this.editingProductId = null;
+    if (!this.newProduct.category) {
+      alert('Selecciona una categoría.');
+      return;
+    }
 
-  } else {
+    if (this.newProduct.price <= 0) {
+      alert('Ingresa un precio válido.');
+      return;
+    }
 
-    const product = {
+    if (this.editingProductId !== null) {
 
-      id: Date.now(),
+      const index = this.products.findIndex(
+        p => p.id === this.editingProductId
+      );
 
-      title: this.newProduct.title,
+      if (index !== -1) {
 
-      description:
-        this.newProduct.description || '',
+        this.products[index] = {
+          id: this.editingProductId,
+          title: this.newProduct.title,
+          description: this.newProduct.description || '',
+          category: this.newProduct.category,
+          price: this.newProduct.price,
+          image: this.newProduct.image
+        };
+      }
 
-      price: this.newProduct.price,
+      this.editingProductId = null;
 
-      image:
-        this.newProduct.image ||
-        'https://picsum.photos/500/350'
+    } else {
 
+      const product = {
+
+        id: Date.now(),
+
+        title: this.newProduct.title,
+
+        description:
+          this.newProduct.description || '',
+
+        category:
+          this.newProduct.category,
+
+        price: this.newProduct.price,
+
+        image:
+          this.newProduct.image ||
+          'https://picsum.photos/500/350'
+      };
+
+      this.products.push(product);
+    }
+
+    localStorage.setItem(
+      'products',
+      JSON.stringify(this.products)
+    );
+
+    this.newProduct = {
+      title: '',
+      description: '',
+      category: '',
+      price: 0,
+      image: ''
     };
-
-    this.products.push(product);
-
-  }
-
-  localStorage.setItem(
-    'products',
-    JSON.stringify(this.products)
-  );
-
-  this.newProduct = {
-    title: '',
-    description: '',
-    price: 0,
-    image: ''
-  };
-
   }
 
   getTotal(): number {
@@ -171,7 +240,7 @@ export class AppComponent implements OnInit {
     this.cart = [];
   }
 
-  async checkout(): Promise<void> {
+    async checkout(): Promise<void> {
 
     try {
 
@@ -194,12 +263,8 @@ export class AppComponent implements OnInit {
 
       const data = await response.json();
 
-      console.log('Stripe response:', data);
-
       if (data.url) {
         window.location.href = data.url;
-      } else {
-        console.error('No se recibió URL de Stripe');
       }
 
     } catch (error) {
@@ -210,4 +275,38 @@ export class AppComponent implements OnInit {
       );
     }
   }
+
+  showFavorites(): void {
+    alert('Favoritos próximamente ❤️');
+  }
+
+  showAccount(): void {
+
+  alert(
+`👤 Mi Cuenta
+
+Nombre: Mi Cuenta
+Correo: usuario@natenova.com
+
+📦 Mis pedidos
+- Pedido #1001
+- Pedido #1002
+
+🔒 Cerrar sesión`
+  );
+
+}
+
+  scrollToProducts(): void {
+
+    const section =
+      document.querySelector('.products-section');
+
+    if (section) {
+      section.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  }
+
 }

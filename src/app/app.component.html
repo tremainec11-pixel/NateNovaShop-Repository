@@ -4,11 +4,77 @@
     NateNovaShop
   </div>
 
-  <button class="cart-btn">
-    🛒 {{ cart.length }}
-  </button>
+  <!-- BUSCADOR -->
+  <div class="header-search">
+
+    <input
+      type="text"
+      placeholder="🔍 Buscar productos..."
+      [(ngModel)]="searchTerm"
+    >
+
+  </div>
+
+  <!-- MENU -->
+  <div class="header-menu">
+
+    <button
+  class="nav-btn"
+  (click)="showFavorites()"
+>
+  ❤️ Favoritos
+  <span *ngIf="favorites.length > 0">
+    {{ favorites.length }}
+  </span>
+</button>
+
+    <button
+  class="nav-btn"
+  (click)="showAccount()"
+>
+  👤 Cuenta
+   </button>
+
+   <button
+  class="shop-btn"
+  (click)="scrollToProducts()"
+>
+  Ver productos
+    </button>
+
+    <button class="cart-btn">
+      🛒 {{ cart.length }}
+    </button>
+
+  </div>
 
 </header>
+<div
+  class="account-panel"
+  *ngIf="showAccountPanel"
+>
+
+  <h3>👤 Mi Cuenta</h3>
+
+  <p><strong>Nombre:</strong> Invitado</p>
+
+  <p>
+  <strong>Correo:</strong>
+  usuario&#64;natenova.com
+</p>
+
+  <h4>📦 Mis pedidos</h4>
+
+  <ul>
+    <li>Pedido #1001</li>
+    <li>Pedido #1002</li>
+  </ul>
+
+  <button (click)="showAccountPanel = false">
+  Cerrar
+</button>
+
+</div>
 
 <!-- HERO -->
 
@@ -31,9 +97,12 @@
       Productos exclusivos con pagos seguros usando Stripe
     </p>
 
-    <button class="shop-btn">
-      Ver productos
-    </button>
+    <button
+  class="shop-btn"
+  (click)="scrollToProducts()"
+>
+  Ver productos
+  </button>
 
   </div>
 
@@ -49,35 +118,86 @@
 
   <div class="form">
 
-    <input
-      type="text"
-      placeholder="Nombre"
-      [(ngModel)]="newProduct.title"
-    >
+  <input
+    type="text"
+    placeholder="Nombre"
+    [(ngModel)]="newProduct.title"
+  >
 
-    <input
-      type="number"
-      placeholder="Precio"
-      [(ngModel)]="newProduct.price"
-    >
+  <input
+    type="text"
+    placeholder="Descripción"
+    [(ngModel)]="newProduct.description"
+  >
 
-    <input
-      type="text"
-      placeholder="Imagen URL"
-      [(ngModel)]="newProduct.image"
-    >
+  <select [(ngModel)]="newProduct.category">
 
-    <button (click)="addProduct()">
-      Agregar
-    </button>
+    <option value="">
+      Selecciona categoría
+    </option>
 
-  </div>
+    <option value="Electronics">
+      Electronics
+    </option>
+
+    <option value="Clothing">
+      Clothing
+    </option>
+
+    <option value="Furniture">
+      Furniture
+    </option>
+
+    <option value="Gaming">
+      Gaming
+    </option>
+
+    <option value="Accessories">
+      Accessories
+    </option>
+
+  </select>
+
+  <input
+    type="number"
+    placeholder="Precio"
+    [(ngModel)]="newProduct.price"
+  >
+
+  <input
+    type="text"
+    placeholder="Imagen URL"
+    [(ngModel)]="newProduct.image"
+  >
+
+  <button (click)="addProduct()">
+    {{ editingProductId ? 'Guardar Cambios' : 'Agregar' }}
+  </button>
+
+</div>
 
 </section>
 
 <!-- PRODUCTS -->
 
 <section class="products-section">
+
+  <div class="filter-container">
+
+  <label>Filtrar por categoría:</label>
+
+  <select [(ngModel)]="selectedCategory">
+
+    <option value="All">Todas</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Clothing">Clothing</option>
+    <option value="Furniture">Furniture</option>
+    <option value="Gaming">Gaming</option>
+    <option value="Accessories">Accessories</option>
+
+  </select>
+
+</div>
 
   <div class="section-header">
 
@@ -91,28 +211,39 @@
 
   </div>
 
-  <div class="products">
+<div class="products">
 
     <div
-      class="card"
-      *ngFor="let product of products"
-    >
+  class="card"
+  *ngFor="let product of getFilteredProducts()"
+>
+
 
       <img [src]="product.image">
+      <button
+  class="favorite-icon"
+  (click)="toggleFavorite(product)"
+>
+  {{ isFavorite(product) ? '❤️' : '🤍' }}
+  </button>
 
       <div class="card-content">
 
         <h3>
-          {{ product.title }}
-        </h3>
+  {{ product.title }}
+  </h3>
 
-        <p class="description">
-          {{ product.description }}
-        </p>
+  <p class="description">
+  {{ product.description }}
+  </p>
 
-        <p class="price">
-          ${{ product.price }}
-        </p>
+  <p class="category">
+  {{ product.category }}
+  </p>
+
+  <p class="price">
+  ${{ product.price }}
+  </p>
 
         <div class="actions">
 
